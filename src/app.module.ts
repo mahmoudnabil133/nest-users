@@ -6,6 +6,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './users/users.entity';
 import { AuthModule } from './auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
+import { NodemailerModule } from './nodemailer/nodemailer.module';
 
 @Module({
   imports: [UsersModule,
@@ -23,7 +24,8 @@ import { ConfigModule } from '@nestjs/config';
       synchronize: true
       
     }),
-    AuthModule
+    AuthModule,
+    NodemailerModule
   ],
   controllers: [AppController],
   providers: [AppService],

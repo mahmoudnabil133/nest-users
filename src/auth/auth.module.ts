@@ -5,9 +5,11 @@ import { UsersModule } from 'src/users/users.module';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthGuard } from './auth.guard';
+import { NodemailerModule } from 'src/nodemailer/nodemailer.module';
 
 @Module({
-  imports: [UsersModule, 
+  imports: [UsersModule,
+    NodemailerModule,
     JwtModule.registerAsync({
       imports:[ConfigModule],
       inject:[ConfigService],

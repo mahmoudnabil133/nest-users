@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Not, Repository } from 'typeorm';
+import { MoreThan, Not, Repository } from 'typeorm';
 import { User } from './users.entity';
 import { UserResponseDto } from './dto/user-response.dto';
 import * as bcrypt from 'bcrypt'
@@ -21,10 +21,17 @@ export class UsersService {
         if (!user) throw new NotFoundException(`user with id: ${id} is not found`)
         return new UserResponseDto(user)
     }
-    async findOneByEmail(email: string) : Promise<UserResponseDto> {
+    async findOneByEmail(email: string) : Promise<User> {
         const user = await this.userRepository.findOneBy({ email });
         if (!user) throw new NotFoundException(`user with email: ${email} not found`);
-        return new UserResponseDto(user);
+        return user;
+    }
+    async findOneByResetCode(resetCode: string): Promise<User> {
+        const user = await this.userRepository.
+            findOneBy({ passwordResetCode:resetCode, 
+            passwordResetCodeExpires: MoreThan(new Date()) });
+        if (!user) throw new NotFoundException('invalid reset code');
+        return user;
     }
 
     async createOne(user: CreateUserDto): Promise<UserResponseDto> {
@@ -46,7 +53,9 @@ export class UsersService {
         return new UserResponseDto(newUser)
 
     }
-
+    async saveUser(doc: User): Promise<User> {
+        return await this.userRepository.save(doc)
+    }
     async deleteOne(id:number) :Promise<any> {
         const res = await this.userRepository.delete(id)
         if (res.affected === 0) throw new NotFoundException(`user with id: ${id} not found`)
